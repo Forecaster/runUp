@@ -1,0 +1,16 @@
+[
+{
+  "modid": "runup",
+  "name": "RunUp",
+  "description": "Lets you run through a forest or a field uninterrupted!",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "http://towerofawesome.org/mods/",
+  "updateUrl": "",
+  "authors": ["Forecaster"],
+  "credits": "Iguana_man, his iguanatweaks code helped me figure out configs. Buildcraft code helped with figuring out the tickhandler. Plus the guys in #minecraftforge for answering questions.",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
