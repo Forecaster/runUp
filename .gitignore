@@ -1,0 +1,13 @@
+/world/
+/stats/
+/screenshots/
+/saves/
+/resourcepacks/
+/out/
+/mods/
+/gradle/
+/crash-reports/
+/config/
+/build/
+/.gradle/
+/eclipse/
