@@ -4,12 +4,7 @@ import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
-/**
- * Created by Forecaster on 2014-09-18.
- */
 public class ConfigHandler
 {
   static boolean enabled = true;
@@ -28,7 +23,7 @@ public class ConfigHandler
     {
       configuration.load();
 
-      enabled = configuration.get("A Priority", "enabled", true, "Set to false to disable mod without uninstalling. Default: true").getBoolean(true);
+      enabled = configuration.get("Enabled", "enabled", true, "Set to false to disable mod without uninstalling. Default: true").getBoolean(true);
       checkInterval = configuration.get(Configuration.CATEGORY_GENERAL, "checkInterval", 10, "Check every x tick. A value of 1 equals a check every tick (May impact performance). Default: 10").getInt();
       alwaysOn = configuration.get(Configuration.CATEGORY_GENERAL, "alwaysOn", false, "Ignore the list below. Ensure that step height is always 1. Default: false").getBoolean();
       rotationMatters = configuration.get(Configuration.CATEGORY_GENERAL, "rotationMatters", true, "Enables also checking the block in front of you, allowing for improved control. Default: true").getBoolean();
@@ -37,7 +32,7 @@ public class ConfigHandler
     }
     catch (Exception e)
     {
-
+      e.printStackTrace();
     }
     finally
     {
