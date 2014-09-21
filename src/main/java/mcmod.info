@@ -1,0 +1,15 @@
+[{
+  "modid": "runup",
+  "name": "RunUp",
+  "description": "A simple mod to let you run unhindered over certain blocks.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "logoFile": "",
+  "url": "http://towerofawesome.org/mods/",
+  "updateUrl": "",
+  "authors": ["Forecaster"],
+  "credits": "",
+  "parent": "",
+  "screenshots": [],
+  "dependencies": []
+}]
