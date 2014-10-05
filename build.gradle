@@ -17,13 +17,13 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "1.7.10-1.1"
+version = "1.7.10-1.1.1"
 group= "com.forecaster.runup" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "runUp"
 
 minecraft {
     version = "1.7.10-10.13.1.1217"
-    runDir = "eclipse"
+    runDir = "testClient"
 }
 
 dependencies {

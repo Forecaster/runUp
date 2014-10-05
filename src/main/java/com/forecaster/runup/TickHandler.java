@@ -8,12 +8,18 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
+import net.minecraftforge.event.entity.EntityEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 
 @SideOnly(Side.CLIENT)
 public class TickHandler
 {
   int clock = 0;
   Float targetHeight = 0.5F;
+  boolean enabledWarningSent = false;
+  boolean worldIsRemoteWarningSent = false;
+  static int worldIsRemoteTicks = 0;
+  String state;
 
   @SubscribeEvent
   public void onPlayerTick(TickEvent.PlayerTickEvent event)
@@ -21,74 +27,120 @@ public class TickHandler
     Boolean blockMatch;
     EntityPlayer player = event.player;
 
-    if (ConfigHandler.alwaysOn)
+
+    if (ConfigHandler.alwaysOn || ConfigHandler.tempAlwaysOn) //AlwaysOn mode
     {
       if (ConfigHandler.enabled)
       {
         if (player.stepHeight != 1F)
         {
           setStepHeight(player, 1F);
-          System.out.println("Set stepheight to 1");
+          if (ConfigHandler.debug)
+            System.out.println("Set stepheight to 1");
         }
       }
-      System.out.println(player.stepHeight);
-    }
-    else
-    {
-      if (ConfigHandler.enabled)
+      else if (!enabledWarningSent)
       {
-        if (clock % ConfigHandler.checkInterval == 0)
+        Util.sendChatMessage(player, "The mod is disabled! It will do nothing until enabled in the config.");
+        enabledWarningSent = true;
+      }
+    }
+    else //Normal mode
+    {
+      if (clock % ConfigHandler.checkInterval == 0)
+      {
+        if (ConfigHandler.enabled)
         {
           World world = player.getEntityWorld();
 
-          int x = (int) Math.floor(player.posX);
-          int y = (int) Math.floor(player.posY);
-          int z = (int) Math.floor(player.posZ);
+          if (world.isRemote)
+            state = "Remote";
+          else
+            state = "Local";
 
-          Block block = world.getBlock(x, y - 1, z);
-
-          if (block != null && block != Block.getBlockFromName("minecraft:air"))
+          if (world.isRemote)
           {
-            //int id = Block.getIdFromBlock(block);
-
-            //Block testBlock = Block.getBlockFromName("minecraft:stone");
-
-            String[] blockList = ConfigHandler.blocklist;
-            blockMatch = false;
-            int i = 0;
-
-            System.out.println("Block test started!");
-            while (!blockMatch && i < blockList.length)
+            if (worldIsRemoteTicks > 10)
             {
-              Block testBlock = Block.getBlockFromName(blockList[i]);
-
-              if (block == testBlock)
+              if (!worldIsRemoteWarningSent)
               {
-                blockMatch = true;
+                Util.sendChatMessage(player, "The world is remote. This means you are likely playing on a server, which means I can't get the block you are standing on from the server at the moment. Sorry! Because of this I've enabled \"AlwaysOn\" mode for this session for you! This functionality will come soon!");
+                ConfigHandler.tempAlwaysOn = true;
+                worldIsRemoteWarningSent = true;
+              }
+            }
+            else if (worldIsRemoteTicks != -1)
+              worldIsRemoteTicks++;
+          }
+
+          if (!world.isRemote)
+          {
+            if (worldIsRemoteTicks != -1)
+            {
+              if (ConfigHandler.debug) System.out.println("Recieved local world in " + worldIsRemoteTicks + " ticks!");
+              worldIsRemoteTicks = -1;
+            }
+
+            int x = (int) Math.floor(player.posX);
+            int y = (int) Math.floor(player.posY);
+            int z = (int) Math.floor(player.posZ);
+
+            Block block = world.getBlock(x, y - 1, z);
+
+            if (block == null)
+              if (ConfigHandler.debug)
+                System.out.println("Block is null");
+            else
+              if (ConfigHandler.debug)
+                System.out.println(block.getLocalizedName());
+
+            if (block != null && block != Block.getBlockFromName("minecraft:air"))
+            {
+              //int id = Block.getIdFromBlock(block);
+
+              //Block testBlock = Block.getBlockFromName("minecraft:stone");
+
+              String[] blockList = ConfigHandler.blocklist;
+              blockMatch = false;
+              int i = 0;
+
+              while (!blockMatch && i < blockList.length)
+              {
+                Block testBlock = Block.getBlockFromName(blockList[i]);
+
+                if (block == testBlock)
+                {
+                  blockMatch = true;
+                }
+
+                i++;
               }
 
-              i++;
-            }
-
-            if (!ConfigHandler.blacklist)
-            {
-              if (blockMatch)
-                targetHeight = 1F;
-              else
-                targetHeight = 0.5F;
-            }
-            else
-            {
-              if (!blockMatch)
-                targetHeight = 1F;
-              else
-                targetHeight = 0.5F;
+              if (!ConfigHandler.blacklist)
+              {
+                if (blockMatch)
+                  targetHeight = 1F;
+                else
+                  targetHeight = 0.5F;
+              } else
+              {
+                if (!blockMatch)
+                  targetHeight = 1F;
+                else
+                  targetHeight = 0.5F;
+              }
             }
           }
+          if (world.isRemote)
+            setStepHeight(player, targetHeight);
         }
-        setStepHeight(player, targetHeight);
-        clock++;
+        else if (!enabledWarningSent)
+        {
+          Util.sendChatMessage(player, "The mod is disabled! It will do nothing until enabled in the config.");
+          enabledWarningSent = true;
+        }
       }
+      clock++;
     }
   }
 
@@ -97,7 +149,8 @@ public class TickHandler
     if (player.stepHeight != height)
     {
       player.stepHeight = height;
-      player.addChatComponentMessage(new ChatComponentText("[" + References.MODNAME + "]: StepHeight was set to " + height));
+      if (ConfigHandler.debug)
+        Util.sendChatMessage(player, "[" + this.state + "] StepHeight was set to " + height);
       return true;
     }
     else

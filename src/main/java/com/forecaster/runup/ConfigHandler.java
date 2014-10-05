@@ -10,9 +10,11 @@ public class ConfigHandler
   static boolean enabled = true;
   static int checkInterval = 2;
   static boolean alwaysOn = false;
+  static boolean tempAlwaysOn = false;
   static boolean rotationMatters = true;
   static boolean blacklist = false;
   static String[] blocklist = new String[] {};
+  static boolean debug = false;
 
   public static void init(File configFile)
   {
@@ -29,6 +31,7 @@ public class ConfigHandler
       rotationMatters = configuration.get(Configuration.CATEGORY_GENERAL, "rotationMatters", true, "Enables also checking the block in front of you, allowing for improved control. Default: true").getBoolean();
       blacklist = configuration.get(Configuration.CATEGORY_GENERAL, "blacklist", false, "Turn the whitelist below into a blacklist. Default: false").getBoolean();
       blocklist = configuration.get(Configuration.CATEGORY_GENERAL, "blocklist", new String[]{"minecraft:stone", "minecraft:grass", "minecraft:sand", "minecraft:gravel", "minecraft:snow_layer", "minecraft:ice", "minecraft:snow", "minecraft:netherrack", "minecraft:soul_sand", "minecraft:mycelium", "minecraft:end_stone"}, "The blocks that will cause your step height to be set by default, or which will not if blacklist is true. Default: minecraft:stone, minecraft:grass, minecraft:sand, minecraft:gravel, minecraft:snow_layer, minecraft:ice, minecraft:snow, minecraft:netherrack, minecraft:soul_sand, minecraft:mycelium, minecraft:end_stone").getStringList();
+      debug = configuration.get("Debug", "debug", false, "Enable debug output").getBoolean();
     }
     catch (Exception e)
     {
@@ -39,6 +42,6 @@ public class ConfigHandler
       configuration.save();
     }
 
-    RunUp.modLogOut(Level.INFO, "Config loaded!");
+    Util.modLogOut(Level.INFO, "Config loaded!");
   }
 }
